@@ -136,7 +136,7 @@ class Project(_Pointer):
     def end(self):
         project = self.obj
         return max (
-            map(lambda t: t.last_item.end, project.tracks)
+            map(lambda t: t.last_item.end, self.tracks)
         )
 
 def newAction(description, target=0):

@@ -56,5 +56,5 @@ def distribute_slide_items():
  
              
 if __name__ == "__main__":
-     cleanup_slides()
-     #distribute_slide_items()
+    distribute_slide_items()
+    #cleanup_slides()
