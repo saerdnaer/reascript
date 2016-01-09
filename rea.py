@@ -1,7 +1,10 @@
 
+# from https://github.com/teamikl/reascript-latency-compensation/blob/master/rea.py
+
 import sys
 from contextlib import contextmanager
 from reaper_python import *
+from sws_python64 import *
 
 def getScriptPath():
     return sys.path[0]
@@ -24,15 +27,51 @@ class _Pointer:
     def __repr__(self):
         return "<{} {}>".format(self.__class__.__name__, hash(self.obj))
 
+class Source(_Pointer):
+    @property
+    def type(self):
+        return RPR_GetMediaSourceType(self.obj, "", 30)[1]
+
+class MediaItem_Take(_Pointer):
+    @property
+    def source(self):
+        return Source(RPR_GetMediaItemTake_Source(self.obj))
 
 class MediaItem(_Pointer):
+
+    def get(self, name):
+        return RPR_GetMediaItemInfo_Value(self.obj, name)
+    def set(self, name, value):
+        RPR_SetMediaItemInfo_Value(self.obj, name, value)   
 
     def getPosition(self):
         return RPR_GetMediaItemInfo_Value(self.obj, "D_POSITION")
     def setPosition(self, value):
         RPR_SetMediaItemInfo_Value(self.obj, "D_POSITION", value)
     position = property(getPosition, setPosition)
+    
+    length = property(lambda self: self.get("D_LENGTH"), 
+                   lambda self, v: self.set("D_LENGTH", v))
+    
+    @property
+    def end(self):
+        return self.position + self.length 
 
+    def getNote(self):
+        return ULT_GetMediaItemNote(self.obj)
+    def setNote(self, value):
+        ULT_SetMediaItemNote(self.obj, value)
+    note = property(getNote, setNote) 
+
+
+ 
+    
+    @property
+    def activeTake(self):
+        take = RPR_GetMediaItemTake(self.obj, int(self.get('I_CURTAKE')))
+        return MediaItem_Take(take)
+    
+    
 
 class Track(_Pointer):
 
@@ -40,21 +79,34 @@ class Track(_Pointer):
     def name(self):
         return RPR_GetSetMediaTrackInfo_String(self.obj, "P_NAME", "", False)[3]
 
+
+    @property
+    def items_count(self):
+        track = self.obj
+        return RPR_CountTrackMediaItems(track)
+
     @property
     def items(self):
         track = self.obj
         # nItems = RPR_GetNumMediaItems(track)
-        nItems = RPR_CountTrackMediaItems(track)
+        nItems = self.items_count
         for idx in range(nItems):
             item = RPR_GetTrackMediaItem(track, idx)
             yield MediaItem(item)
-
+    
+    @property
+    def last_item(self):
+         track = self.obj
+         item = RPR_GetTrackMediaItem(track, self.items_count-1)
+         return MediaItem(item)
+#        return self.last_item.end
 
 class Project(_Pointer):
 
     def __init__(self, project=0):
         """project=0 for current project"""
-        super().__init__(project)
+        #super().__init__(project) # python3 
+        _Pointer.__init__(self, project)
 
     @property
     def path(self):
@@ -76,17 +128,13 @@ class Project(_Pointer):
             yield self
         finally:
             RPR_Undo_EndBlock2(project, description, flag)
+    
+    @property
+    def end(self):
+        project = self.obj
+        return max (
+            map(lambda t: t.last_item.end, project.tracks)
+        )
 
-
-def newTask(description, target=0):
+def newAction(description, target=0):
     return Project(target).undoable(description)
-
-
-def loadTable(filename):
-    ms = lambda x: x/1000.0
-    samples = lambda samples,khz: ms(samples/khz)
-    _trimComment = lambda x: x[:x.index("#")] if "#" in x else x
-    return eval('{{{0}}}'.format(
-            ",".join( '"{}": {}'.format(*line.strip().split(":",1))
-                for line in map(_trimComment,open(filename))
-                    if ":" in line and line.strip())))
