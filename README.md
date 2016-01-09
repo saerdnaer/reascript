@@ -15,6 +15,8 @@ git clone https://github.com/saerdnaer/reascript.git .
 
 See Screencast: https://youtu.be/Z6z7e-62Rdg 
 
+[![Screencast](http://img.youtube.com/vi/Z6z7e-62Rdg/0.jpg)](http://www.youtube.com/watch?v=Z6z7e-62Rdg)
+
 * create Reaper project file and add your audio track
 * add empty track called 'Slides' 
 * convert your slide to one image (e.g. png file) per slide
