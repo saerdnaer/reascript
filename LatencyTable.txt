@@ -1,7 +1,0 @@
-#
-# Table for user latency adjustment.
-#
-
-anon: -0.01  # adjust 10ms (0.01 seconds) latency
-
-tea: -ms(12+12)  # user "tea" uses direct monitoring with 12ms/12ms latencies.
