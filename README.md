@@ -11,6 +11,10 @@ git clone https://github.com/saerdnaer/reascript.git .
 
 # Usage
 
+**Warning: This is script is still in alpha phase.** *I don't know/have not tested yet how to export the slides from reaper again. ;-)*
+
+See Screencast: https://youtu.be/Z6z7e-62Rdg 
+
 * create Reaper project file and add your audio track
 * add empty track called 'Slides' 
 * convert your slide to one image (e.g. png file) per slide
@@ -19,5 +23,10 @@ git clone https://github.com/saerdnaer/reascript.git .
 * click ReaScript button 'Load…'
 * select 'ultraschall_andi_slides.py'
 * click ReaScript button 'Edit…'
+* click Start script
+* fix slides allignment how you need it... notice the two different ways!
+* comment `distribute_slide_items()` and uncomment `cleanup_slides()`
+* save changes with cmd+S (reaper runs the script automatically)
 
-See Screencast... 
+If something goes wrong just use the undo feature of Reaper.
+
