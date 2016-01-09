@@ -99,6 +99,9 @@ class Track(_Pointer):
          track = self.obj
          item = RPR_GetTrackMediaItem(track, self.items_count-1)
          return MediaItem(item)
+     
+#    @property
+#    def end(self):
 #        return self.last_item.end
 
 class Project(_Pointer):
