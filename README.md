@@ -5,7 +5,7 @@ Collection of Reaper scripts
 
 Run in terminal
 ```
-cd "~/Library/Application Support/REAPER/Scripts"
+cd ~/Library/Application\ Support/REAPER/Scripts
 git clone https://github.com/saerdnaer/reascript.git .
 ```
 
